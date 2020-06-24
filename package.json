@@ -38,6 +38,12 @@
     },
     "rules": {}
   },
+  "prettier": {
+    "trailingComma": "all",
+    "semi": true,
+    "arrowParens": "avoid",
+    "printWidth": 120
+  },
   "browserslist": [
     "> 1%",
     "last 2 versions",
