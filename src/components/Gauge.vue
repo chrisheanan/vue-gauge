@@ -30,16 +30,16 @@
     </svg>
     <div class="labels">
       <div class="min" :style="{ flexBasis: `${thickness}px`}">
-        <span>{{ min }}</span>
-        <span class="unit">{{ unit }}</span>
+        <span v-text="min"></span>
+        <span class="unit" v-text="unit"></span>
       </div>
       <div class="max" :style="{ flexBasis: `${thickness}px`}">
-        <span>{{ max }}</span>
-        <span class="unit">{{ unit }}</span>
+        <span v-text="max"></span>
+        <span class="unit" v-text="unit"></span>
       </div>
       <div class="value">
-        <span>{{ displayValue }}</span>
-        <span class="unit">{{ unit }}</span>
+        <Count :to="displayValueWithDp" :dp="dp"></Count>
+        <span class="unit" v-text="unit"></span>
       </div>
     </div>
   </section>
@@ -47,11 +47,13 @@
 
 <script>
 import Arc from "./Gauge/Arc.vue";
+import Count from "./Count.vue";
 
 export default {
   name: "Gauge",
   components: {
     Arc,
+    Count,
   },
   props: {
     title: {
@@ -69,6 +71,11 @@ export default {
     value: {
       type: Number,
       required: true,
+    },
+    dp: {
+      type: Number,
+      required: false,
+      default: 0,
     },
     unit: {
       type: String,
@@ -91,6 +98,12 @@ export default {
     diameter() {
       return this.radius * 2;
     },
+    displayValueWithDp() {
+      if (this.dp === 0) {
+        return this.displayValue;
+      }
+      return parseFloat(this.displayValue.toFixed(this.dp));
+    },
     displayValue() {
       if (this.value > this.max) {
         return this.max;
@@ -103,7 +116,7 @@ export default {
       return this.value;
     },
     rotationAngle() {
-      return ((this.displayValue - this.min) / (this.max - this.min)) * 180;
+      return ((this.displayValueWithDp - this.min) / (this.max - this.min)) * 180;
     },
     needleRotationStyle() {
       return {
@@ -120,6 +133,7 @@ export default {
 <style scoped>
 section {
   position: relative;
+  padding: 1em;
 }
 
 svg {
@@ -154,6 +168,9 @@ svg {
   flex: 1 1 auto;
   font-size: 6em;
   margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
 }
 
 .value .unit,
