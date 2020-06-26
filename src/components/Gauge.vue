@@ -28,10 +28,10 @@
             :radius="radius"
             :thickness="thickness"
             :offsetY="10"
-            fill="currentcolor"
+            fill="red"
             :pointerEdgeStart="true"
-            :pointerEdgeEnd="true"
-            :arcAngle="352"
+            :pointerEdgeEnd="false"
+            :arcAngle="176"
             :rotationAngle="4"
           />
 
@@ -39,28 +39,33 @@
             :radius="radius"
             :thickness="thickness"
             :offsetY="10"
-            fill="grey"
-            :arcAngle="340"
-            :rotationAngle="10"
+            fill="none"
+            stroke="white"
+            :stroke-width="2"
+            :pointerEdgeEnd="true"
+            :arcAngle="176"
+            :rotationAngle="180"
           />
 
-          <Arc
+          <!-- <Arc
             :radius="radius"
             :thickness="thickness"
             :offsetY="10"
-            fill="red"
-            :arcAngle="10"
-            :rotationAngle="175"
-          />
+            fill="purple"
+            :pointerEdgeStart="true"
+            :pointerEdgeEnd="true"
+            :arcAngle="352"
+            :rotationAngle="4"
+          />-->
 
-          <Arc
+          <!-- <Arc
             :radius="radius"
             :thickness="thickness"
             :offsetY="10"
             fill="blue"
             :arcAngle="45"
             :rotationAngle="45"
-          />
+          />-->
         </g>
       </g>
     </svg>

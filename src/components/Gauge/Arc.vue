@@ -75,17 +75,24 @@ export default {
       let innerAngleB = this.angleB;
 
       if (this.pointerEdgeStart || this.pointerEdgeEnd) {
-        const outerOpposite = Math.tan(angleInRadians(this.rotationAngle)) * this.radius;
+        const outerOpposite = Math.tan(angleInRadians(4)) * this.radius;
 
         const pointerAdjustedInnerAngle = angleInDegrees(Math.atan(outerOpposite / this.innerRadius));
+
         if (this.pointerEdgeStart) {
           innerAngleA = this.max360(pointerAdjustedInnerAngle - 180);
         }
 
         if (this.pointerEdgeEnd) {
-          const innerArcAngle = this.arcAngle + this.rotationAngle * 2 - pointerAdjustedInnerAngle * 2;
-          innerAngleB = this.max360(pointerAdjustedInnerAngle + innerArcAngle - 180);
+          innerAngleB = this.max360(pointerAdjustedInnerAngle * -1 + 180);
         }
+        console.log({
+          innerAngleB,
+          outerOpposite,
+          pointerAdjustedInnerAngle,
+          arcAngle: this.arcAngle,
+          rotationAngle: this.rotationAngle,
+        });
       }
 
       const outerArc = arcPath(this.centerX, this.centerY, this.radius, this.angleA, this.angleB, this.largeArcFlag);
