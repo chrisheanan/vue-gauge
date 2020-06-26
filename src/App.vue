@@ -1,22 +1,31 @@
 <template>
-  <div id="app">
+  <section>
+    <h1>Gauges</h1>
+
     <button
       type="button"
-      @click="() => {exampleValue = (Math.random() * Math.floor(100));}"
+      @click="() => {
+        exampleValue = Math.random() * Math.floor(100);
+      }"
     >Random Number</button>
-    <Gauge
-      title="Example Gauge"
-      fontSize="1em"
-      :min="0"
-      :max="100"
-      :dp="1"
-      :value="exampleValue"
-      unit="%"
-      style="width: 430px"
-    />
 
-    <Gauge title="Example 2 Gauge" :min="5" :max="30" :value="20" style="width: 430px" />
-  </div>
+    <div id="app">
+      <Gauge
+        title="Example Random Value"
+        fontSize="1em"
+        :min="0"
+        :max="100"
+        :dp="1"
+        :value="exampleValue"
+        unit="%"
+        style="width: 430px"
+      />
+
+      <!-- <Gauge title="Example 2 Fixed" :min="5" :max="30" :value="20" style="width: 430px" />
+      <Gauge title="Example 3 Zero Meter" :min="5" :max="30" :value="5" style="width: 430px" />
+      <Gauge title="Example 4 Full Reading" :min="5" :max="30" :value="30" style="width: 430px" />-->
+    </div>
+  </section>
 </template>
 
 <script>
@@ -48,6 +57,12 @@ body {
   color: #fff;
   margin-top: 60px;
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-around;
+}
+
+button {
+  margin: auto;
+  display: block;
 }
 </style>

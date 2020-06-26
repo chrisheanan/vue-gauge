@@ -9,15 +9,15 @@ export default {
   props: {
     stroke: {
       type: String,
-      default: "currentcolor",
+      default: "none",
     },
     strokeWidth: {
       type: Number,
-      default: 1,
+      default: 0,
     },
     fill: {
       type: String,
-      default: "none",
+      default: "currentcolor",
     },
     thickness: {
       type: Number,
@@ -35,14 +35,26 @@ export default {
       type: Number,
       default: 0,
     },
-    offsetAngle: {
+    arcAngle: {
       type: Number,
-      default: -180,
+      required: true,
+    },
+    rotationAngle: {
+      type: Number,
+      default: 0,
+    },
+    pointerEdgeStart: {
+      type: Boolean,
+      default: false,
+    },
+    pointerEdgeEnd: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
     return {
-      angle: 4,
+      adjustedRotationAngle: this.rotationAngle - 180,
       innerRadius: this.radius - this.thickness,
       centerX: this.radius + this.offsetX,
       centerY: this.radius + this.offsetY,
@@ -50,21 +62,33 @@ export default {
   },
   computed: {
     angleA() {
-      return this.max360(this.angle + this.offsetAngle);
+      return this.max360(this.adjustedRotationAngle);
     },
     angleB() {
-      return this.max360(360 - this.angle + this.offsetAngle);
+      return this.max360(this.arcAngle + this.adjustedRotationAngle);
+    },
+    largeArcFlag() {
+      return this.arcAngle > 180;
     },
     d() {
-      const outerOpposite = Math.tan(angleInRadians(this.angle)) * this.radius;
+      let innerAngleA = this.angleA;
+      let innerAngleB = this.angleB;
 
-      const innerAngle = angleInDegrees(Math.atan(outerOpposite / this.innerRadius));
+      if (this.pointerEdgeStart || this.pointerEdgeEnd) {
+        const outerOpposite = Math.tan(angleInRadians(this.rotationAngle)) * this.radius;
 
-      const innerAngleA = this.max360(innerAngle + this.offsetAngle);
+        const pointerAdjustedInnerAngle = angleInDegrees(Math.atan(outerOpposite / this.innerRadius));
+        if (this.pointerEdgeStart) {
+          innerAngleA = this.max360(pointerAdjustedInnerAngle - 180);
+        }
 
-      const innerAngleB = this.max360(360 - innerAngle + this.offsetAngle);
+        if (this.pointerEdgeEnd) {
+          const innerArcAngle = this.arcAngle + this.rotationAngle * 2 - pointerAdjustedInnerAngle * 2;
+          innerAngleB = this.max360(pointerAdjustedInnerAngle + innerArcAngle - 180);
+        }
+      }
 
-      const outerArc = arcPath(this.centerX, this.centerY, this.radius, this.angleA, this.angleB, true);
+      const outerArc = arcPath(this.centerX, this.centerY, this.radius, this.angleA, this.angleB, this.largeArcFlag);
 
       const outerStart = polarToCartesian(this.centerX, this.centerY, this.radius, this.angleB);
 
@@ -74,7 +98,7 @@ export default {
         this.innerRadius,
         -1 * innerAngleB,
         -1 * innerAngleA,
-        true,
+        this.largeArcFlag,
         true,
       );
 
@@ -92,5 +116,3 @@ export default {
   },
 };
 </script>
-
-<style scoped></style>

@@ -2,12 +2,12 @@
   <section :style="{fontSize}">
     <h2>{{ title }}</h2>
 
-    <svg :viewBox="`0 0 ${diameter} ${radius + 35}`" xmlns="http://www.w3.org/2000/svg">
-      <defs>
+    <svg :viewBox="`0 0 ${diameter} ${radius + radius + 35}`" xmlns="http://www.w3.org/2000/svg">
+      <!-- <defs>
         <clipPath id="cut-off-bottom">
           <rect x="0" y="0" :width="diameter" :height="radius + 10" />
         </clipPath>
-      </defs>
+      </defs>-->
 
       <g :style="needleRotationStyle">
         <circle :cx="radius" :cy="radius + 10" r="25" fill="currentcolor" />
@@ -24,7 +24,43 @@
 
       <g clip-path="url(#cut-off-bottom)">
         <g :style="needleRotationStyle">
-          <Arc :radius="radius" :thickness="thickness" :offsetY="10" fill="currentcolor" />
+          <Arc
+            :radius="radius"
+            :thickness="thickness"
+            :offsetY="10"
+            fill="currentcolor"
+            :pointerEdgeStart="true"
+            :pointerEdgeEnd="true"
+            :arcAngle="352"
+            :rotationAngle="4"
+          />
+
+          <Arc
+            :radius="radius"
+            :thickness="thickness"
+            :offsetY="10"
+            fill="grey"
+            :arcAngle="340"
+            :rotationAngle="10"
+          />
+
+          <Arc
+            :radius="radius"
+            :thickness="thickness"
+            :offsetY="10"
+            fill="red"
+            :arcAngle="10"
+            :rotationAngle="175"
+          />
+
+          <Arc
+            :radius="radius"
+            :thickness="thickness"
+            :offsetY="10"
+            fill="blue"
+            :arcAngle="45"
+            :rotationAngle="45"
+          />
         </g>
       </g>
     </svg>
@@ -123,6 +159,7 @@ export default {
         transition: "1s ease-in-out transform",
         transform: `rotate(${this.rotationAngle}deg)`,
         transformOrigin: "215px 225px",
+        willChange: "transform",
       };
     },
   },
