@@ -2,12 +2,12 @@
   <section :style="{fontSize}">
     <h2>{{ title }}</h2>
 
-    <svg :viewBox="`0 0 ${diameter} ${radius + radius + 35}`" xmlns="http://www.w3.org/2000/svg">
-      <!-- <defs>
+    <svg :viewBox="`0 0 ${diameter} ${radius + 35}`" xmlns="http://www.w3.org/2000/svg">
+      <defs>
         <clipPath id="cut-off-bottom">
           <rect x="0" y="0" :width="diameter" :height="radius + 10" />
         </clipPath>
-      </defs>-->
+      </defs>
 
       <g :style="needleRotationStyle">
         <circle :cx="radius" :cy="radius + 10" r="25" fill="currentcolor" />
@@ -24,15 +24,19 @@
 
       <g clip-path="url(#cut-off-bottom)">
         <g :style="needleRotationStyle">
-          <Arc
+          <pointer-arcs :radius="radius" :thickness="thickness" :offsetY="10" />
+          <!-- <Arc
             :radius="radius"
             :thickness="thickness"
             :offsetY="10"
-            fill="red"
+            fill="maroon"
             :pointerEdgeStart="true"
             :pointerEdgeEnd="false"
             :arcAngle="176"
             :rotationAngle="4"
+            :startAngle="4"
+            :startInnerAngle="5.9"
+            :endAngle="180"
           />
 
           <Arc
@@ -45,7 +49,10 @@
             :pointerEdgeEnd="true"
             :arcAngle="176"
             :rotationAngle="180"
-          />
+            :startAngle="180"
+            :endAngle="356"
+            :endInnerAngle="360 - 5.9"
+          />-->
 
           <!-- <Arc
             :radius="radius"
@@ -87,14 +94,16 @@
 </template>
 
 <script>
-import Arc from "./Gauge/Arc.vue";
+// import Arc from "./Gauge/Arc.vue";
+import PointerArcs from "./Gauge/PointerArcs.vue";
 import Count from "./Count.vue";
 
 export default {
   name: "Gauge",
   components: {
-    Arc,
+    // Arc,
     Count,
+    PointerArcs,
   },
   props: {
     title: {

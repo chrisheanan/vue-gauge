@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import { arcPath, angleInRadians, angleInDegrees, polarToCartesian } from "../../lib/chart";
+import { arcPath, polarToCartesian } from "../../lib/chart";
 
 export default {
   props: {
@@ -35,66 +35,48 @@ export default {
       type: Number,
       default: 0,
     },
-    arcAngle: {
+    startAngle: {
       type: Number,
       required: true,
     },
-    rotationAngle: {
+    endAngle: {
       type: Number,
-      default: 0,
+      required: true,
     },
-    pointerEdgeStart: {
-      type: Boolean,
-      default: false,
+    startInnerAngle: {
+      type: Number,
+      required: false,
     },
-    pointerEdgeEnd: {
-      type: Boolean,
-      default: false,
+    endInnerAngle: {
+      type: Number,
+      required: false,
     },
   },
   data() {
     return {
-      adjustedRotationAngle: this.rotationAngle - 180,
       innerRadius: this.radius - this.thickness,
       centerX: this.radius + this.offsetX,
       centerY: this.radius + this.offsetY,
+      originAngleOffset: 180,
     };
   },
   computed: {
     angleA() {
-      return this.max360(this.adjustedRotationAngle);
+      return this.max360(this.startAngle - this.originAngleOffset);
     },
     angleB() {
-      return this.max360(this.arcAngle + this.adjustedRotationAngle);
+      return this.max360(this.endAngle - this.originAngleOffset);
+    },
+    innerAngleA() {
+      return this.max360(this.startInnerAngle ? this.startInnerAngle - this.originAngleOffset : this.angleA);
+    },
+    innerAngleB() {
+      return this.max360(this.endInnerAngle ? this.endInnerAngle - this.originAngleOffset : this.angleB);
     },
     largeArcFlag() {
-      return this.arcAngle > 180;
+      return this.angleB - this.angleA > 180;
     },
     d() {
-      let innerAngleA = this.angleA;
-      let innerAngleB = this.angleB;
-
-      if (this.pointerEdgeStart || this.pointerEdgeEnd) {
-        const outerOpposite = Math.tan(angleInRadians(4)) * this.radius;
-
-        const pointerAdjustedInnerAngle = angleInDegrees(Math.atan(outerOpposite / this.innerRadius));
-
-        if (this.pointerEdgeStart) {
-          innerAngleA = this.max360(pointerAdjustedInnerAngle - 180);
-        }
-
-        if (this.pointerEdgeEnd) {
-          innerAngleB = this.max360(pointerAdjustedInnerAngle * -1 + 180);
-        }
-        console.log({
-          innerAngleB,
-          outerOpposite,
-          pointerAdjustedInnerAngle,
-          arcAngle: this.arcAngle,
-          rotationAngle: this.rotationAngle,
-        });
-      }
-
       const outerArc = arcPath(this.centerX, this.centerY, this.radius, this.angleA, this.angleB, this.largeArcFlag);
 
       const outerStart = polarToCartesian(this.centerX, this.centerY, this.radius, this.angleB);
@@ -103,15 +85,15 @@ export default {
         this.centerX,
         this.centerY,
         this.innerRadius,
-        -1 * innerAngleB,
-        -1 * innerAngleA,
+        -1 * this.innerAngleB,
+        -1 * this.innerAngleA,
         this.largeArcFlag,
         true,
       );
 
-      const innerStart = polarToCartesian(this.centerX, this.centerY, this.innerRadius, innerAngleB);
+      const innerStart = polarToCartesian(this.centerX, this.centerY, this.innerRadius, this.innerAngleB);
 
-      const innerEnd = polarToCartesian(this.centerX, this.centerY, this.innerRadius, innerAngleA);
+      const innerEnd = polarToCartesian(this.centerX, this.centerY, this.innerRadius, this.innerAngleA);
 
       return `M ${innerStart.x} ${innerStart.y} L ${outerStart.x} ${outerStart.y} ${outerArc} L ${innerEnd.x} ${innerEnd.y} ${innerArc}`;
     },
