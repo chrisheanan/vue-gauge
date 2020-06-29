@@ -1,5 +1,11 @@
 <template>
-  <path :d="d" :stroke="stroke" :stroke-width="strokeWidth" :fill="fill" />
+  <path
+    :d="d"
+    :stroke="stroke"
+    :stroke-width="strokeWidth"
+    :fill="fill"
+    :style="{ transitionDelay: `${transitionDelay}s` }"
+  />
 </template>
 
 <script>
@@ -50,6 +56,11 @@ export default {
     endInnerAngle: {
       type: Number,
       required: false,
+    },
+    transitionDelay: {
+      type: Number,
+      required: false,
+      default: 0,
     },
   },
   data() {
@@ -105,3 +116,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+path {
+  transition: 0.3s fill ease-in-out, 0.3s stroke ease-in-out, 0.3s stroke-width ease-in-out;
+}
+</style>

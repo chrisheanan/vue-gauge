@@ -1,5 +1,5 @@
 <template>
-  <section :style="{fontSize}">
+  <section :style="{ fontSize }">
     <h2>{{ title }}</h2>
 
     <svg :viewBox="`0 0 ${diameter} ${radius + 35}`" xmlns="http://www.w3.org/2000/svg">
@@ -7,72 +7,68 @@
         <clipPath id="cut-off-bottom">
           <rect x="0" y="0" :width="diameter" :height="radius + 10" />
         </clipPath>
-      </defs>
 
-      <g :style="needleRotationStyle">
-        <circle :cx="radius" :cy="radius + 10" r="25" fill="currentcolor" />
-        <line
-          :x1="radius"
-          :y1="radius + 10"
-          x2="7"
-          :y2="radius + 10"
-          stroke-width="14"
-          stroke="currentcolor"
-          stroke-linecap="round"
-        />
-      </g>
-
-      <g clip-path="url(#cut-off-bottom)">
-        <g :style="needleRotationStyle">
-          <pointer-arcs :radius="radius" :thickness="thickness" :offsetY="10" />
-          <!-- <Arc
-            :radius="radius"
-            :thickness="thickness"
-            :offsetY="10"
-            fill="maroon"
-            :pointerEdgeStart="true"
-            :pointerEdgeEnd="false"
-            :arcAngle="176"
-            :rotationAngle="4"
-            :startAngle="4"
-            :startInnerAngle="5.9"
-            :endAngle="180"
-          />
-
+        <clipPath id="cut-off-max">
           <Arc
             :radius="radius"
             :thickness="thickness"
             :offsetY="10"
-            fill="none"
-            stroke="white"
-            :stroke-width="2"
-            :pointerEdgeEnd="true"
-            :arcAngle="176"
-            :rotationAngle="180"
             :startAngle="180"
-            :endAngle="356"
-            :endInnerAngle="360 - 5.9"
-          />-->
+            :endAngle="360 - pointerGap"
+            :endInnerAngle="360 - innerAngleAdjustment"
+          />
+        </clipPath>
+      </defs>
 
-          <!-- <Arc
+      <g class="rotatable" :style="needleRotationStyle">
+        <pointer
+          :radius="radius"
+          :pointerStroke="pointerStroke"
+          :pointerStrokeWidth="pointerStrokeWidth"
+          :pivotRadius="pivotRadius"
+          :pivotFill="pivotFill"
+          :pivotStroke="pivotStroke"
+          :pivotStrokeWidth="pivotStrokeWidth"
+        />
+      </g>
+
+      <g clip-path="url(#cut-off-bottom)">
+        <g class="rotatable" :style="needleRotationStyle">
+          <pointer-arcs
             :radius="radius"
             :thickness="thickness"
             :offsetY="10"
-            fill="purple"
-            :pointerEdgeStart="true"
-            :pointerEdgeEnd="true"
-            :arcAngle="352"
-            :rotationAngle="4"
-          />-->
+            :activeFill="value >= maxThreshold ? maxThresholdFill : activeFill"
+            :activeStroke="value >= maxThreshold ? maxThresholdStroke : activeStroke"
+            :activeStrokeWidth="value >= maxThreshold ? maxThresholdStrokeWidth : activeStrokeWidth"
+            :inactiveFill="value >= maxThreshold ? maxThresholdFill : inactiveFill"
+            :inactiveStroke="value >= maxThreshold ? maxThresholdStroke : inactiveStroke"
+            :inactiveStrokeWidth="value >= maxThreshold ? maxThresholdStrokeWidth : inactiveStrokeWidth"
+            :angle="pointerGap"
+            :transitionDelay="maxTransitionDelay"
+          />
+        </g>
+      </g>
 
-          <!-- <Arc
-            :radius="radius"
-            :thickness="thickness"
-            :offsetY="10"
-            fill="blue"
-            :arcAngle="45"
-            :rotationAngle="45"
-          />-->
+      <g clip-path="url(#cut-off-bottom)">
+        <g class="rotatable" :style="{ transform: `rotate(${maxThresholdAngle}deg)` }">
+          <g clip-path="url(#cut-off-max)">
+            <g class="rotatable" :style="{ transform: `rotate(-${maxThresholdAngle}deg)` }">
+              <g class="rotatable" :style="needleRotationStyle">
+                <pointer-arcs
+                  :radius="radius"
+                  :thickness="thickness"
+                  :offsetY="10"
+                  :inactive="false"
+                  :activeFill="activeFill"
+                  :activeStroke="activeStroke"
+                  :activeStrokeWidth="activeStrokeWidth"
+                  :angle="pointerGap"
+                  v-if="maxThreshold !== null"
+                />
+              </g>
+            </g>
+          </g>
         </g>
       </g>
     </svg>
@@ -94,15 +90,19 @@
 </template>
 
 <script>
-// import Arc from "./Gauge/Arc.vue";
+import Arc from "./Gauge/Arc.vue";
+import Pointer from "./Gauge/Pointer.vue";
 import PointerArcs from "./Gauge/PointerArcs.vue";
 import Count from "./Count.vue";
+import styleProps from "../lib/svgStyleProps";
+import { innerAnglePointerAdjustment } from "../lib/chart";
 
 export default {
   name: "Gauge",
   components: {
-    // Arc,
+    Arc,
     Count,
+    Pointer,
     PointerArcs,
   },
   props: {
@@ -122,6 +122,16 @@ export default {
       type: Number,
       required: true,
     },
+    maxThreshold: {
+      type: Number,
+      required: false,
+      default: null,
+    },
+    minThresold: {
+      type: Number,
+      required: false,
+      default: null,
+    },
     dp: {
       type: Number,
       required: false,
@@ -132,16 +142,56 @@ export default {
       required: false,
       default: null,
     },
+    radius: {
+      type: Number,
+      required: false,
+      default: 215,
+    },
+    height: {
+      type: Number,
+      required: false,
+      default: 225,
+    },
+    thickness: {
+      type: Number,
+      required: false,
+      default: 70,
+    },
     fontSize: {
       type: String,
+      required: false,
       default: "16px",
     },
+    pointerGap: {
+      type: Number,
+      required: false,
+      default: 4,
+    },
+    pointerStroke: {
+      type: String,
+      required: false,
+      default: "currentcolor",
+    },
+    pointerStrokeWidth: {
+      type: Number,
+      required: false,
+      default: 14,
+    },
+    pivotRadius: {
+      type: Number,
+      required: false,
+      default: 20,
+    },
+    ...styleProps("pivot", { strokeWidth: 2, stroke: "currentcolor", fill: "currentcolor" }),
+    ...styleProps("arc"),
+    ...styleProps("minThreshold"),
+    ...styleProps("maxThreshold"),
+    ...styleProps("active", { fill: "currentcolor" }),
+    ...styleProps("inactive", { fill: "none" }),
   },
   data() {
     return {
-      radius: 215,
-      height: 225,
-      thickness: 70,
+      maxTransitionDelay: 0,
     };
   },
   computed: {
@@ -165,19 +215,45 @@ export default {
 
       return this.value;
     },
-    rotationAngle() {
-      return ((this.displayValueWithDp - this.min) / (this.max - this.min)) * 180;
+    innerAngleAdjustment() {
+      return innerAnglePointerAdjustment(this.pointerGap, this.radius, this.radius - this.thickness);
+    },
+    needleAngle() {
+      return this.calcArcAngle(this.displayValueWithDp);
     },
     needleRotationStyle() {
       return {
-        transition: "1s ease-in-out transform",
-        transform: `rotate(${this.rotationAngle}deg)`,
-        transformOrigin: "215px 225px",
-        willChange: "transform",
+        transform: `rotate(${this.needleAngle}deg)`,
       };
     },
+    maxThresholdRotationStyle() {
+      const angle =
+        this.value >= this.maxThreshold ? this.maxThresholdAngle : this.needleAngle - (180 - this.maxThresholdAngle);
+      return {
+        transform: `rotate(${angle < 0 ? 0 : angle}deg)`,
+      };
+    },
+    maxThresholdAngle() {
+      return this.calcArcAngle(this.maxThreshold);
+    },
   },
-  mounted() {},
+  methods: {
+    calcArcAngle(value) {
+      return ((value - this.min) / (this.max - this.min)) * 180;
+    },
+  },
+  watch: {
+    value(newValue, oldValue) {
+      const newValueAngle = this.calcArcAngle(newValue);
+      const oldValueAngle = this.calcArcAngle(oldValue);
+
+      this.maxTransitionDelay =
+        0.7 * Math.abs((this.maxThresholdAngle - oldValueAngle) / (newValueAngle - oldValueAngle));
+
+      console.log({ newValue, oldValue, newValueAngle, oldValueAngle, delay: this.maxTransitionDelay });
+      return this.newValue;
+    },
+  },
 };
 </script>
 
@@ -193,10 +269,11 @@ svg {
   margin: auto;
 }
 
-.needleRotationStyle {
-  transition: 1s ease-in-out transform;
-  transform: rotate(90deg);
+.rotatable {
+  transition: 1s linear transform;
+  transform: rotate(0deg);
   transform-origin: 215px 225px;
+  will-change: transform;
 }
 
 .labels {

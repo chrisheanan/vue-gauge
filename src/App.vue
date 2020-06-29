@@ -19,9 +19,27 @@
         :value="exampleValue"
         unit="%"
         style="width: 430px"
+        inactiveFill="#212121"
+        :maxThreshold="80"
+        maxThresholdFill="darkred"
       />
 
-      <!-- <Gauge title="Example 2 Fixed" :min="5" :max="30" :value="20" style="width: 430px" />
+      <Gauge
+        title="Example 2 Fixed"
+        :min="5"
+        :max="30"
+        :value="20"
+        :maxThreshold="15"
+        style="width: 430px"
+        :pointerGap="2"
+        :thickness="30"
+        :pointerStrokeWidth="4"
+        :pivotRadius="10"
+        :pivotStrokeWidth="3"
+        pivotFill="none"
+      />
+
+      <!--
       <Gauge title="Example 3 Zero Meter" :min="5" :max="30" :value="5" style="width: 430px" />
       <Gauge title="Example 4 Full Reading" :min="5" :max="30" :value="30" style="width: 430px" />-->
     </div>

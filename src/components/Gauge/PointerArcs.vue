@@ -5,12 +5,14 @@
       :thickness="thickness"
       :offsetY="offsetY"
       :offsetX="offsetX"
-      :strokeWidth="strokeWidth"
-      :stroke="stroke"
-      :fill="inactiveColor"
-      :startAngle="this.outerAngle"
-      :startInnerAngle="this.innerAngleAdjustment"
+      :transitionDelay="transitionDelay"
+      :strokeWidth="inactiveStrokeWidth"
+      :stroke="inactiveStroke"
+      :fill="inactiveFill"
+      :startAngle="outerAngle"
+      :startInnerAngle="innerAngleAdjustment"
       :endAngle="180"
+      v-if="inactive"
     />
 
     <Arc
@@ -18,37 +20,28 @@
       :thickness="thickness"
       :offsetY="offsetY"
       :offsetX="offsetX"
-      :strokeWidth="strokeWidth"
-      :stroke="stroke"
-      :fill="activeColor"
+      :transitionDelay="transitionDelay"
+      :strokeWidth="activeStrokeWidth"
+      :stroke="activeStroke"
+      :fill="activeFill"
       :startAngle="180"
-      :endAngle="360 - this.outerAngle"
-      :endInnerAngle="360 - this.innerAngleAdjustment"
+      :endAngle="360 - outerAngle"
+      :endInnerAngle="360 - innerAngleAdjustment"
+      v-if="active"
     />
   </g>
 </template>
 
 <script>
 import Arc from "./Arc.vue";
-import { angleInRadians, angleInDegrees } from "../../lib/chart";
+import { innerAnglePointerAdjustment } from "../../lib/chart";
+import styleProps from "../../lib/svgStyleProps";
 
 export default {
   components: {
     Arc,
   },
   props: {
-    stroke: {
-      type: String,
-      default: "none",
-    },
-    strokeWidth: {
-      type: Number,
-      default: 0,
-    },
-    fill: {
-      type: String,
-      default: "currentcolor",
-    },
     thickness: {
       type: Number,
       required: true,
@@ -65,26 +58,35 @@ export default {
       type: Number,
       default: 0,
     },
-    activeColor: {
-      type: String,
-      default: "currentcolor",
+    angle: {
+      type: Number,
+      default: 4,
     },
-    inactiveColor: {
-      type: String,
-      default: "none",
+    transitionDelay: {
+      type: Number,
+      required: false,
+      default: 0,
     },
+    active: {
+      type: Boolean,
+      default: true,
+    },
+    ...styleProps("active", { fill: "currentcolor" }),
+    inactive: {
+      type: Boolean,
+      default: true,
+    },
+    ...styleProps("inactive", { fill: "none" }),
   },
   data() {
     return {
       innerRadius: this.radius - this.thickness,
-      outerAngle: 4,
+      outerAngle: this.angle,
     };
   },
   computed: {
     innerAngleAdjustment() {
-      const outerOpposite = Math.tan(angleInRadians(this.outerAngle)) * this.radius;
-
-      return angleInDegrees(Math.atan(outerOpposite / this.innerRadius));
+      return innerAnglePointerAdjustment(this.outerAngle, this.radius, this.innerRadius);
     },
   },
 };

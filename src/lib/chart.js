@@ -32,3 +32,9 @@ export const arcPath = (x, y, radius, startAngle, endAngle, largeArcFlag = null,
 
   return arc;
 };
+
+export const innerAnglePointerAdjustment = (outerAngle, outerRadius, innerRadius) => {
+  const outerOpposite = Math.tan(angleInRadians(outerAngle)) * outerRadius;
+
+  return angleInDegrees(Math.atan(outerOpposite / innerRadius));
+};
