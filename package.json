@@ -9,6 +9,7 @@
     "ngrok": "ngrok http -host-header=rewrite localhost:8080"
   },
   "dependencies": {
+    "bezier-easing": "^2.1.0",
     "core-js": "^3.6.5",
     "vue": "^2.6.11"
   },

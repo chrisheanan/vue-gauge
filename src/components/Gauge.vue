@@ -8,14 +8,23 @@
           <rect x="0" y="0" :width="diameter" :height="radius + 10" />
         </clipPath>
 
-        <clipPath id="cut-off-max">
+        <clipPath id="cut-off-min" v-if="minThreshold !== null">
           <Arc
             :radius="radius"
             :thickness="thickness"
             :offsetY="10"
-            :startAngle="180"
-            :endAngle="360 - pointerGap"
-            :endInnerAngle="360 - innerAngleAdjustment"
+            :startAngle="0"
+            :endAngle="minThresholdAngle"
+          />
+        </clipPath>
+
+        <clipPath id="cut-off-max" v-if="maxThreshold !== null">
+          <Arc
+            :radius="radius"
+            :thickness="thickness"
+            :offsetY="10"
+            :startAngle="maxThresholdAngle"
+            :endAngle="180"
           />
         </clipPath>
       </defs>
@@ -38,19 +47,40 @@
             :radius="radius"
             :thickness="thickness"
             :offsetY="10"
-            :activeFill="value >= maxThreshold ? maxThresholdFill : activeFill"
-            :activeStroke="value >= maxThreshold ? maxThresholdStroke : activeStroke"
-            :activeStrokeWidth="value >= maxThreshold ? maxThresholdStrokeWidth : activeStrokeWidth"
-            :inactiveFill="value >= maxThreshold ? maxThresholdFill : inactiveFill"
-            :inactiveStroke="value >= maxThreshold ? maxThresholdStroke : inactiveStroke"
-            :inactiveStrokeWidth="value >= maxThreshold ? maxThresholdStrokeWidth : inactiveStrokeWidth"
+            :activeFill="compActiveFill"
+            :activeStroke="compActiveStroke"
+            :activeStrokeWidth="compActiveStrokeWidth"
+            :inactiveFill="compInactiveFill"
+            :inactiveStroke="compInactiveStroke"
+            :inactiveStrokeWidth="compInactiveStrokeWidth"
             :angle="pointerGap"
             :transitionDelay="maxTransitionDelay"
           />
         </g>
       </g>
 
-      <g clip-path="url(#cut-off-bottom)">
+      <g clip-path="url(#cut-off-bottom)" v-if="minThreshold !== null">
+        <g class="rotatable" :style="{ transform: `rotate(${minThresholdAngle}deg)` }">
+          <g clip-path="url(#cut-off-min)">
+            <g class="rotatable" :style="{ transform: `rotate(-${minThresholdAngle}deg)` }">
+              <g class="rotatable" :style="needleRotationStyle">
+                <pointer-arcs
+                  :radius="radius"
+                  :thickness="thickness"
+                  :offsetY="10"
+                  :active="false"
+                  :inactiveFill="inactiveFill"
+                  :inactiveStroke="inactiveStroke"
+                  :inactiveStrokeWidth="inactiveStrokeWidth"
+                  :angle="pointerGap"
+                />
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+
+      <g clip-path="url(#cut-off-bottom)" v-if="maxThreshold !== null">
         <g class="rotatable" :style="{ transform: `rotate(${maxThresholdAngle}deg)` }">
           <g clip-path="url(#cut-off-max)">
             <g class="rotatable" :style="{ transform: `rotate(-${maxThresholdAngle}deg)` }">
@@ -64,7 +94,6 @@
                   :activeStroke="activeStroke"
                   :activeStrokeWidth="activeStrokeWidth"
                   :angle="pointerGap"
-                  v-if="maxThreshold !== null"
                 />
               </g>
             </g>
@@ -72,6 +101,7 @@
         </g>
       </g>
     </svg>
+
     <div class="labels">
       <div class="min" :style="{ flexBasis: `${thickness}px`}">
         <span v-text="min"></span>
@@ -82,7 +112,7 @@
         <span class="unit" v-text="unit"></span>
       </div>
       <div class="value">
-        <Count :to="displayValueWithDp" :dp="dp"></Count>
+        <count :to="displayValueWithDp" :dp="dp" />
         <span class="unit" v-text="unit"></span>
       </div>
     </div>
@@ -96,6 +126,7 @@ import PointerArcs from "./Gauge/PointerArcs.vue";
 import Count from "./Count.vue";
 import styleProps from "../lib/svgStyleProps";
 import { innerAnglePointerAdjustment } from "../lib/chart";
+import { easingInverse } from "../lib/easing";
 
 export default {
   name: "Gauge",
@@ -127,7 +158,7 @@ export default {
       required: false,
       default: null,
     },
-    minThresold: {
+    minThreshold: {
       type: Number,
       required: false,
       default: null,
@@ -191,10 +222,65 @@ export default {
   },
   data() {
     return {
+      minTransitionDelay: 0,
       maxTransitionDelay: 0,
     };
   },
   computed: {
+    compActiveFill() {
+      if (this.minThresholdActive) {
+        return this.minThresholdFill;
+      } else if (this.maxThresholdActive) {
+        return this.maxThresholdFill;
+      }
+
+      return this.activeFill;
+    },
+    compActiveStroke() {
+      if (this.minThresholdActive) {
+        return this.minThresholdStroke;
+      } else if (this.maxThresholdActive) {
+        return this.maxThresholdStroke;
+      }
+
+      return this.activeStroke;
+    },
+    compActiveStrokeWidth() {
+      if (this.minThresholdActive) {
+        return this.minThresholdStrokeWidth;
+      } else if (this.maxThresholdActive) {
+        return this.maxThresholdStrokeWidth;
+      }
+
+      return this.activeStrokeWidth;
+    },
+    compInactiveFill() {
+      if (this.minThresholdActive) {
+        return this.minThresholdFill;
+      } else if (this.maxThresholdActive) {
+        return this.maxThresholdFill;
+      }
+
+      return this.inactiveFill;
+    },
+    compInactiveStroke() {
+      if (this.minThresholdActive) {
+        return this.minThresholdStroke;
+      } else if (this.maxThresholdActive) {
+        return this.maxThresholdStroke;
+      }
+
+      return this.inactiveStroke;
+    },
+    compInactiveStrokeWidth() {
+      if (this.minThresholdActive) {
+        return this.minThresholdStrokeWidth;
+      } else if (this.maxThresholdActive) {
+        return this.maxThresholdStrokeWidth;
+      }
+
+      return this.inactiveStrokeWidth;
+    },
     diameter() {
       return this.radius * 2;
     },
@@ -226,15 +312,25 @@ export default {
         transform: `rotate(${this.needleAngle}deg)`,
       };
     },
-    maxThresholdRotationStyle() {
-      const angle =
-        this.value >= this.maxThreshold ? this.maxThresholdAngle : this.needleAngle - (180 - this.maxThresholdAngle);
-      return {
-        transform: `rotate(${angle < 0 ? 0 : angle}deg)`,
-      };
+    minThresholdAngle() {
+      // if (this.maxThresholdActive) {
+      //   return 180 + (180 - this.maxThresholdAngle);
+      // }
+
+      return this.calcArcAngle(this.minThreshold);
+    },
+    minThresholdActive() {
+      return this.value <= this.minThreshold;
     },
     maxThresholdAngle() {
+      // if (this.minThresholdActive) {
+      //   return 0;
+      // }
+
       return this.calcArcAngle(this.maxThreshold);
+    },
+    maxThresholdActive() {
+      return this.value >= this.maxThreshold;
     },
   },
   methods: {
@@ -246,11 +342,12 @@ export default {
     value(newValue, oldValue) {
       const newValueAngle = this.calcArcAngle(newValue);
       const oldValueAngle = this.calcArcAngle(oldValue);
+      const easingFunction = easingInverse("ease-in-out");
 
-      this.maxTransitionDelay =
-        0.7 * Math.abs((this.maxThresholdAngle - oldValueAngle) / (newValueAngle - oldValueAngle));
+      this.maxTransitionDelay = easingFunction(
+        0.7 * Math.abs((this.maxThresholdAngle - oldValueAngle) / (newValueAngle - oldValueAngle)),
+      );
 
-      console.log({ newValue, oldValue, newValueAngle, oldValueAngle, delay: this.maxTransitionDelay });
       return this.newValue;
     },
   },
@@ -270,7 +367,7 @@ svg {
 }
 
 .rotatable {
-  transition: 1s linear transform;
+  transition: 1s ease-in-out transform;
   transform: rotate(0deg);
   transform-origin: 215px 225px;
   will-change: transform;

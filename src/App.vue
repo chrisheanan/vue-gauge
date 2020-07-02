@@ -20,7 +20,9 @@
         unit="%"
         style="width: 430px"
         inactiveFill="#212121"
-        :maxThreshold="80"
+        :minThreshold="30"
+        :maxThreshold="70"
+        minThresholdFill="lawngreen"
         maxThresholdFill="darkred"
       />
 
