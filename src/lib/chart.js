@@ -11,7 +11,16 @@ export const angleInRadians = deg => (deg * Math.PI) / 180.0;
 
 export const angleInDegrees = rad => (rad * 180) / Math.PI;
 
-export const arcPath = (x, y, radius, startAngle, endAngle, largeArcFlag = null, sweepFlag = false, moveTo = false) => {
+export const arcPath = (
+  x,
+  y,
+  radius,
+  startAngle,
+  endAngle,
+  largeArcFlag = null,
+  sweepFlag = false,
+  moveTo = false,
+) => {
   const end = polarToCartesian(x, y, radius, Math.abs(startAngle));
 
   if (largeArcFlag === null) {

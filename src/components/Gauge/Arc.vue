@@ -79,16 +79,27 @@ export default {
       return this.max360(this.endAngle - this.originAngleOffset);
     },
     innerAngleA() {
-      return this.max360(this.startInnerAngle ? this.startInnerAngle - this.originAngleOffset : this.angleA);
+      return this.max360(
+        this.startInnerAngle ? this.startInnerAngle - this.originAngleOffset : this.angleA,
+      );
     },
     innerAngleB() {
-      return this.max360(this.endInnerAngle ? this.endInnerAngle - this.originAngleOffset : this.angleB);
+      return this.max360(
+        this.endInnerAngle ? this.endInnerAngle - this.originAngleOffset : this.angleB,
+      );
     },
     largeArcFlag() {
       return this.angleB - this.angleA > 180;
     },
     d() {
-      const outerArc = arcPath(this.centerX, this.centerY, this.radius, this.angleA, this.angleB, this.largeArcFlag);
+      const outerArc = arcPath(
+        this.centerX,
+        this.centerY,
+        this.radius,
+        this.angleA,
+        this.angleB,
+        this.largeArcFlag,
+      );
 
       const outerStart = polarToCartesian(this.centerX, this.centerY, this.radius, this.angleB);
 
@@ -102,9 +113,19 @@ export default {
         true,
       );
 
-      const innerStart = polarToCartesian(this.centerX, this.centerY, this.innerRadius, this.innerAngleB);
+      const innerStart = polarToCartesian(
+        this.centerX,
+        this.centerY,
+        this.innerRadius,
+        this.innerAngleB,
+      );
 
-      const innerEnd = polarToCartesian(this.centerX, this.centerY, this.innerRadius, this.innerAngleA);
+      const innerEnd = polarToCartesian(
+        this.centerX,
+        this.centerY,
+        this.innerRadius,
+        this.innerAngleA,
+      );
 
       return `M ${innerStart.x} ${innerStart.y} L ${outerStart.x} ${outerStart.y} ${outerArc} L ${innerEnd.x} ${innerEnd.y} ${innerArc}`;
     },

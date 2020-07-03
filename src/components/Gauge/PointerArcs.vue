@@ -76,7 +76,7 @@ export default {
       type: Boolean,
       default: true,
     },
-    ...styleProps("inactive", { fill: "none" }),
+    ...styleProps("inactive", { fill: "currentcolor" }),
   },
   data() {
     return {

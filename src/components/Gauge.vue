@@ -4,25 +4,27 @@
 
     <svg :viewBox="`0 0 ${diameter} ${radius + 35}`" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <clipPath id="cut-off-bottom">
+        <clipPath :id="`clip-bottom-${_uid}`">
           <rect x="0" y="0" :width="diameter" :height="radius + 10" />
         </clipPath>
 
-        <clipPath id="cut-off-min" v-if="minThreshold !== null">
+        <clipPath :id="`clip-min-${_uid}`" v-if="minThreshold">
           <Arc
-            :radius="radius"
-            :thickness="thickness"
-            :offsetY="10"
+            :radius="radius + 2"
+            :thickness="thickness + 4"
+            :offsetY="8"
+            :offsetX="-2"
             :startAngle="0"
             :endAngle="minThresholdAngle"
           />
         </clipPath>
 
-        <clipPath id="cut-off-max" v-if="maxThreshold !== null">
+        <clipPath :id="`clip-max-${_uid}`" v-if="maxThreshold">
           <Arc
-            :radius="radius"
-            :thickness="thickness"
-            :offsetY="10"
+            :radius="radius + 2"
+            :thickness="thickness + 4"
+            :offsetY="8"
+            :offsetX="-2"
             :startAngle="maxThresholdAngle"
             :endAngle="180"
           />
@@ -41,73 +43,62 @@
         />
       </g>
 
-      <g clip-path="url(#cut-off-bottom)">
+      <g :clip-path="`url(#clip-bottom-${_uid})`">
         <g class="rotatable" :style="needleRotationStyle">
           <pointer-arcs
             :radius="radius"
             :thickness="thickness"
             :offsetY="10"
-            :activeFill="compActiveFill"
-            :activeStroke="compActiveStroke"
-            :activeStrokeWidth="compActiveStrokeWidth"
-            :inactiveFill="compInactiveFill"
-            :inactiveStroke="compInactiveStroke"
-            :inactiveStrokeWidth="compInactiveStrokeWidth"
+            :activeFill="activeFill"
+            :inactiveFill="inactiveFill"
             :angle="pointerGap"
-            :transitionDelay="maxTransitionDelay"
           />
         </g>
       </g>
 
-      <g clip-path="url(#cut-off-bottom)" v-if="minThreshold !== null">
-        <g class="rotatable" :style="{ transform: `rotate(${minThresholdAngle}deg)` }">
-          <g clip-path="url(#cut-off-min)">
-            <g class="rotatable" :style="{ transform: `rotate(-${minThresholdAngle}deg)` }">
-              <g class="rotatable" :style="needleRotationStyle">
-                <pointer-arcs
-                  :radius="radius"
-                  :thickness="thickness"
-                  :offsetY="10"
-                  :active="false"
-                  :inactiveFill="inactiveFill"
-                  :inactiveStroke="inactiveStroke"
-                  :inactiveStrokeWidth="inactiveStrokeWidth"
-                  :angle="pointerGap"
-                />
-              </g>
-            </g>
-          </g>
+      <g :clip-path="`url(#clip-min-${_uid})`" v-if="minThreshold">
+        <g class="rotatable" :style="needleRotationStyle">
+          <pointer-arcs
+            :radius="radius"
+            :thickness="thickness"
+            :offsetY="10"
+            :activeFill="minThresholdFill"
+            :activeStroke="minThresholdFill"
+            :activeStrokeWidth="1"
+            :inactiveFill="minThresholdFill"
+            :inactiveStroke="minThresholdFill"
+            :inactiveStrokeWidth="1"
+            :angle="pointerGap"
+            :style="minThresholdStyle"
+          />
         </g>
       </g>
 
-      <g clip-path="url(#cut-off-bottom)" v-if="maxThreshold !== null">
-        <g class="rotatable" :style="{ transform: `rotate(${maxThresholdAngle}deg)` }">
-          <g clip-path="url(#cut-off-max)">
-            <g class="rotatable" :style="{ transform: `rotate(-${maxThresholdAngle}deg)` }">
-              <g class="rotatable" :style="needleRotationStyle">
-                <pointer-arcs
-                  :radius="radius"
-                  :thickness="thickness"
-                  :offsetY="10"
-                  :inactive="false"
-                  :activeFill="activeFill"
-                  :activeStroke="activeStroke"
-                  :activeStrokeWidth="activeStrokeWidth"
-                  :angle="pointerGap"
-                />
-              </g>
-            </g>
-          </g>
+      <g :clip-path="`url(#clip-max-${_uid})`" v-if="maxThreshold">
+        <g class="rotatable" :style="needleRotationStyle">
+          <pointer-arcs
+            :radius="radius"
+            :thickness="thickness"
+            :offsetY="10"
+            :activeFill="maxThresholdFill"
+            :activeStroke="maxThresholdFill"
+            :activeStrokeWidth="1"
+            :inactiveFill="maxThresholdFill"
+            :inactiveStroke="maxThresholdFill"
+            :inactiveStrokeWidth="1"
+            :angle="pointerGap"
+            :style="maxThresholdStyle"
+          />
         </g>
       </g>
     </svg>
 
     <div class="labels">
-      <div class="min" :style="{ flexBasis: `${thickness}px`}">
+      <div class="min" :style="{ flexBasis: `${thickness}px` }">
         <span v-text="min"></span>
         <span class="unit" v-text="unit"></span>
       </div>
-      <div class="max" :style="{ flexBasis: `${thickness}px`}">
+      <div class="max" :style="{ flexBasis: `${thickness}px` }">
         <span v-text="max"></span>
         <span class="unit" v-text="unit"></span>
       </div>
@@ -213,12 +204,31 @@ export default {
       required: false,
       default: 20,
     },
-    ...styleProps("pivot", { strokeWidth: 2, stroke: "currentcolor", fill: "currentcolor" }),
-    ...styleProps("arc"),
-    ...styleProps("minThreshold"),
-    ...styleProps("maxThreshold"),
-    ...styleProps("active", { fill: "currentcolor" }),
-    ...styleProps("inactive", { fill: "none" }),
+    ...styleProps("pivot", {
+      strokeWidth: 2,
+      stroke: "currentcolor",
+      fill: "currentcolor",
+    }),
+    minThresholdFill: {
+      type: String,
+      required: false,
+      default: "none",
+    },
+    maxThresholdFill: {
+      type: String,
+      required: false,
+      default: "none",
+    },
+    activeFill: {
+      type: String,
+      required: false,
+      default: "currentcolor",
+    },
+    inactiveFill: {
+      type: String,
+      required: false,
+      default: "currentcolor",
+    },
   },
   data() {
     return {
@@ -227,82 +237,45 @@ export default {
     };
   },
   computed: {
-    compActiveFill() {
-      if (this.minThresholdActive) {
-        return this.minThresholdFill;
-      } else if (this.maxThresholdActive) {
-        return this.maxThresholdFill;
-      }
-
-      return this.activeFill;
-    },
-    compActiveStroke() {
-      if (this.minThresholdActive) {
-        return this.minThresholdStroke;
-      } else if (this.maxThresholdActive) {
-        return this.maxThresholdStroke;
-      }
-
-      return this.activeStroke;
-    },
-    compActiveStrokeWidth() {
-      if (this.minThresholdActive) {
-        return this.minThresholdStrokeWidth;
-      } else if (this.maxThresholdActive) {
-        return this.maxThresholdStrokeWidth;
-      }
-
-      return this.activeStrokeWidth;
-    },
-    compInactiveFill() {
-      if (this.minThresholdActive) {
-        return this.minThresholdFill;
-      } else if (this.maxThresholdActive) {
-        return this.maxThresholdFill;
-      }
-
-      return this.inactiveFill;
-    },
-    compInactiveStroke() {
-      if (this.minThresholdActive) {
-        return this.minThresholdStroke;
-      } else if (this.maxThresholdActive) {
-        return this.maxThresholdStroke;
-      }
-
-      return this.inactiveStroke;
-    },
-    compInactiveStrokeWidth() {
-      if (this.minThresholdActive) {
-        return this.minThresholdStrokeWidth;
-      } else if (this.maxThresholdActive) {
-        return this.maxThresholdStrokeWidth;
-      }
-
-      return this.inactiveStrokeWidth;
+    inverseMode() {
+      return this.min > this.max;
     },
     diameter() {
       return this.radius * 2;
     },
     displayValueWithDp() {
       if (this.dp === 0) {
-        return this.displayValue;
+        return parseInt(this.displayValue);
       }
       return parseFloat(this.displayValue.toFixed(this.dp));
     },
     displayValue() {
-      if (this.value > this.max) {
-        return this.max;
-      }
+      if (this.inverseMode) {
+        if (this.value > this.min) {
+          return this.min;
+        }
 
-      if (this.value < this.min) {
-        return this.min;
+        if (this.value < this.max) {
+          return this.max;
+        }
+      } else {
+        if (this.value > this.max) {
+          return this.max;
+        }
+
+        if (this.value < this.min) {
+          return this.min;
+        }
       }
 
       return this.value;
     },
     innerAngleAdjustment() {
-      return innerAnglePointerAdjustment(this.pointerGap, this.radius, this.radius - this.thickness);
+      return innerAnglePointerAdjustment(
+        this.pointerGap,
+        this.radius,
+        this.radius - this.thickness,
+      );
     },
     needleAngle() {
       return this.calcArcAngle(this.displayValueWithDp);
@@ -313,24 +286,40 @@ export default {
       };
     },
     minThresholdAngle() {
-      // if (this.maxThresholdActive) {
-      //   return 180 + (180 - this.maxThresholdAngle);
-      // }
-
       return this.calcArcAngle(this.minThreshold);
     },
     minThresholdActive() {
+      if (this.inverseMode) {
+        return this.value >= this.minThreshold;
+      }
+
       return this.value <= this.minThreshold;
     },
+    minThresholdStyle() {
+      return {
+        transitionDelay: `${this.minTransitionDelay}s`,
+        transition: "opacity 0.15s ease-out",
+        opacity: this.minThresholdActive ? 1 : 0,
+        willChange: "opacity",
+      };
+    },
     maxThresholdAngle() {
-      // if (this.minThresholdActive) {
-      //   return 0;
-      // }
-
       return this.calcArcAngle(this.maxThreshold);
     },
     maxThresholdActive() {
+      if (this.inverseMode) {
+        return this.value <= this.maxThreshold;
+      }
+
       return this.value >= this.maxThreshold;
+    },
+    maxThresholdStyle() {
+      return {
+        transitionDelay: `${this.maxTransitionDelay}s`,
+        transition: "opacity 0.15s ease-out",
+        opacity: this.maxThresholdActive ? 1 : 0,
+        willChange: "opacity",
+      };
     },
   },
   methods: {
@@ -344,8 +333,12 @@ export default {
       const oldValueAngle = this.calcArcAngle(oldValue);
       const easingFunction = easingInverse("ease-in-out");
 
+      this.minTransitionDelay = easingFunction(
+        Math.abs((this.minThresholdAngle - oldValueAngle) / (newValueAngle - oldValueAngle)),
+      );
+
       this.maxTransitionDelay = easingFunction(
-        0.7 * Math.abs((this.maxThresholdAngle - oldValueAngle) / (newValueAngle - oldValueAngle)),
+        Math.abs((this.maxThresholdAngle - oldValueAngle) / (newValueAngle - oldValueAngle)),
       );
 
       return this.newValue;
