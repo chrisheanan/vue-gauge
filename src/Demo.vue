@@ -1,14 +1,16 @@
 <template>
   <section>
-    <h1>Gauges</h1>
+    <h1>Demo Gauges</h1>
 
-    <button type="button" @click="random">Random Number</button>
+    <aside>
+      <button type="button" @click="minToMax">0 - 100 Toggle</button>
 
-    <button type="button" @click="minToMax">0 - 100 Toggle</button>
+      <button type="button" @click="random">Random Number</button>
+    </aside>
 
     <div id="app">
       <Gauge
-        title="Example Random Value"
+        title="Example"
         fontSize="1em"
         :min="0"
         :max="100"
@@ -24,7 +26,7 @@
       />
 
       <Gauge
-        title="Example Random Value"
+        title="Inverse Example"
         fontSize="1em"
         :min="100"
         :max="0"
@@ -35,67 +37,80 @@
         inactiveFill="#212121"
         :minThreshold="80"
         :maxThreshold="25"
+        :pointerGap="5"
+        :pointerStrokeWidth="16"
         minThresholdFill="darkred"
         maxThresholdFill="lawngreen"
       />
 
       <Gauge
-        title="Example 2 Fixed"
+        title="Minimal Example"
         :min="5"
         :max="30"
-        :value="20"
-        :maxThreshold="5"
+        :value="exampleValue"
+        :maxThreshold="25"
         style="width: 430px"
         maxThresholdFill="darkred"
         :pointerGap="2"
-        :thickness="30"
+        :thickness="15"
         :pointerStrokeWidth="4"
         :pivotRadius="10"
         :pivotStrokeWidth="3"
         pivotFill="none"
+        inactiveFill="#222"
       />
 
       <Gauge
-        title="Example 3 Zero Meter"
-        :min="5"
-        :max="30"
-        :value="5"
-        style="width: 430px"
-        inactiveStroke="currentcolor"
-        :inactiveStrokeWidth="2"
-        :pointerGap="2"
-        :thickness="30"
-        :pointerStrokeWidth="4"
-        :pivotRadius="10"
-        :pivotStrokeWidth="3"
-      />
-
-      <Gauge
-        title="Example 4 Full Reading"
-        :min="5"
-        :max="30"
-        :value="30"
-        style="width: 430px"
-        activeFill="silver"
-        activeStroke="currentcolor"
-        :activeStrokeWidth="2"
-        inactiveStroke="currentcolor"
-        :inactiveStrokeWidth="2"
-        :pointerGap="2"
-        :thickness="30"
-        :pointerStrokeWidth="4"
-        :pivotRadius="10"
-        :pivotStrokeWidth="3"
-      />
-
-      <Gauge
-        title="Example 5"
+        title="Traffic Light Example"
         :min="0"
-        :max="100"
+        :max="50"
         :value="exampleValue"
         style="width: 430px"
+        minThreshold="15"
+        minThresholdFill="lawngreen"
+        maxThreshold="35"
+        maxThresholdFill="darkred"
+        activeFill="yellow"
+        inactiveFill="yellow"
+        :pointerGap="2"
+        :thickness="40"
+        :pointerStrokeWidth="4"
+        :pivotRadius="10"
+        :pivotStrokeWidth="3"
+      />
+
+      <Gauge
+        title="Negative Range Example"
+        :min="-50"
+        :max="50"
+        unit="C"
+        :value="exampleValue - 50"
+        minThreshold="-15"
+        minThresholdFill="skyblue"
+        maxThreshold="35"
+        maxThresholdFill="green"
+        style="width: 430px"
         activeFill="dodgerblue"
-        inactiveFill="#444"
+        inactiveFill="none"
+        :pointerGap="2"
+        :thickness="10"
+        pointerStroke="dodgerblue"
+        :pointerStrokeWidth="4"
+        :pivotRadius="2"
+        pivotFill="dodgerblue"
+        pivotStroke="dodgerblue"
+        :pivotStrokeWidth="1"
+      />
+
+      <Gauge
+        title="Example "
+        :min="0"
+        :max="120"
+        unit="mph"
+        :value="exampleValue"
+        style="width: 430px"
+        activeFill="currentcolor"
+        inactiveFill="currentcolor"
         :pointerGap="2"
         :thickness="5"
         pointerStroke="darkred"
@@ -104,10 +119,8 @@
         pivotFill="none"
         pivotStroke="darkred"
         :pivotStrokeWidth="3"
-        minThresholdFill="lawngreen"
-        :minThreshold="15"
         maxThresholdFill="darkred"
-        :maxThreshold="95"
+        :maxThreshold="70"
       />
     </div>
   </section>
@@ -140,22 +153,42 @@ export default {
 <style>
 body {
   background-color: #000;
-}
-
-#app {
+  color: #fff;
   font-family: Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+h1 {
+  margin: auto;
+  padding: 1em;
   text-align: center;
+}
+
+aside {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+}
+
+button {
+  border: none;
+  border-radius: 3px;
+  background-color: #06c;
   color: #fff;
+  display: block;
+  font-weight: bold;
+  font-size: 1em;
+  height: 2em;
+  margin: auto 1em;
+  padding: 0 1em;
+}
+
+#app {
+  text-align: center;
   margin-top: 60px;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-around;
-}
-
-button {
-  margin: auto;
-  display: block;
 }
 </style>

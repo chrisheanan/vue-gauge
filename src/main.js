@@ -1,8 +1,13 @@
-import Vue from "vue";
-import App from "./App.vue";
+import Gauge from "./src/components/Gauge.vue";
 
-Vue.config.productionTip = false;
+if (typeof window !== "undefined") {
+  window.Vue.use(Gauge);
+}
 
-new Vue({
-  render: h => h(App),
-}).$mount("#app");
+export default {
+  install(Vue) {
+    Vue.component("Gauge", Gauge);
+  },
+};
+
+export { Gauge };

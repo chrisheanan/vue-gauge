@@ -1,6 +1,6 @@
 <template>
   <section :style="{ fontSize }">
-    <h2>{{ title }}</h2>
+    <heading :level="2" v-text="title" />
 
     <svg :viewBox="`0 0 ${diameter} ${radius + 35}`" xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -93,28 +93,24 @@
       </g>
     </svg>
 
-    <div class="labels">
-      <div class="min" :style="{ flexBasis: `${thickness}px` }">
-        <span v-text="min"></span>
-        <span class="unit" v-text="unit"></span>
-      </div>
-      <div class="max" :style="{ flexBasis: `${thickness}px` }">
-        <span v-text="max"></span>
-        <span class="unit" v-text="unit"></span>
-      </div>
-      <div class="value">
-        <count :to="displayValueWithDp" :dp="dp" />
-        <span class="unit" v-text="unit"></span>
-      </div>
-    </div>
+    <labels
+      :min="min"
+      :max="max"
+      :value="displayValue"
+      :dp="dp"
+      :unit="unit"
+      :thickness="thickness"
+      :fontSize="fontSize"
+    />
   </section>
 </template>
 
 <script>
 import Arc from "./Gauge/Arc.vue";
+import Heading from "./Heading.vue";
+import Labels from "./Gauge/Labels.vue";
 import Pointer from "./Gauge/Pointer.vue";
 import PointerArcs from "./Gauge/PointerArcs.vue";
-import Count from "./Count.vue";
 import styleProps from "../lib/svgStyleProps";
 import { innerAnglePointerAdjustment } from "../lib/chart";
 import { easingInverse } from "../lib/easing";
@@ -123,7 +119,8 @@ export default {
   name: "Gauge",
   components: {
     Arc,
-    Count,
+    Labels,
+    Heading,
     Pointer,
     PointerArcs,
   },
@@ -243,12 +240,6 @@ export default {
     diameter() {
       return this.radius * 2;
     },
-    displayValueWithDp() {
-      if (this.dp === 0) {
-        return parseInt(this.displayValue);
-      }
-      return parseFloat(this.displayValue.toFixed(this.dp));
-    },
     displayValue() {
       if (this.inverseMode) {
         if (this.value > this.min) {
@@ -278,7 +269,7 @@ export default {
       );
     },
     needleAngle() {
-      return this.calcArcAngle(this.displayValueWithDp);
+      return this.calcArcAngle(this.displayValue);
     },
     needleRotationStyle() {
       return {
@@ -364,37 +355,5 @@ svg {
   transform: rotate(0deg);
   transform-origin: 215px 225px;
   will-change: transform;
-}
-
-.labels {
-  display: flex;
-  flex-flow: row nowrap;
-  margin-top: -0.5rem;
-}
-
-.min,
-.max {
-  font-size: 2em;
-  flex: 0 0 auto;
-}
-
-.max {
-  order: 1;
-}
-
-.value {
-  flex: 1 1 auto;
-  font-size: 6em;
-  margin-top: 1rem;
-  display: flex;
-  justify-content: center;
-  align-items: baseline;
-}
-
-.value .unit,
-.min .unit,
-.max .unit {
-  font-size: 0.6em;
-  margin-left: 0.125em;
 }
 </style>
