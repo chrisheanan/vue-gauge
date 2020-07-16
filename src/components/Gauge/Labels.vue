@@ -1,18 +1,37 @@
 <template>
-  <div class="labels">
-    <div class="min" :style="{ flexBasis: `${thickness}px` }">
-      <span v-text="min"></span>
-      <span class="unit" v-text="unit"></span>
-    </div>
-    <div class="max" :style="{ flexBasis: `${thickness}px` }">
-      <span v-text="max"></span>
-      <span class="unit" v-text="unit"></span>
-    </div>
-    <div class="value">
-      <count :to="valueDp" :dp="dp" />
-      <span class="unit" v-text="unit"></span>
-    </div>
-  </div>
+  <g fill="currentcolor">
+    <text
+      class="min"
+      :x="thickness / 2"
+      :y="radius + offsetY"
+      :dy="2.5 * calculatedFontSize"
+      v-if="labelsOnArc"
+    >
+      <tspan v-text="min" />
+      <tspan class="unit" v-text="unit" v-if="unit && unitOnArc" />
+    </text>
+
+    <text
+      class="max"
+      :x="radius * 2 - thickness / 2"
+      :y="radius + offsetY"
+      :dy="2.5 * calculatedFontSize"
+      v-if="labelsOnArc"
+    >
+      <tspan v-text="max" />
+      <tspan class="unit" v-text="unit" v-if="unit && unitOnArc" />
+    </text>
+
+    <text
+      class="value"
+      :x="radius"
+      :y="radius + offsetY"
+      :dy="(labelsOnArc ? 6.25 : 5.25) * calculatedFontSize"
+    >
+      <count :to="valueDp" :dp="dp" tag="tspan" />
+      <tspan class="unit" v-text="unit" v-if="unit" />
+    </text>
+  </g>
 </template>
 
 <script>
@@ -24,11 +43,11 @@ export default {
   },
   props: {
     min: {
-      type: Number,
+      type: [String, Number],
       required: true,
     },
     max: {
-      type: Number,
+      type: [String, Number],
       required: true,
     },
     value: {
@@ -45,15 +64,34 @@ export default {
       required: false,
       default: null,
     },
+    radius: {
+      type: Number,
+      required: true,
+    },
     thickness: {
       type: Number,
       required: false,
       default: 70,
     },
-    fontSize: {
-      type: String,
+    calculatedFontSize: {
+      type: [String, Number],
       required: false,
-      default: "16px",
+      default: "1em",
+    },
+    offsetY: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
+    unitOnArc: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+    labelsOnArc: {
+      type: Boolean,
+      required: false,
+      default: true,
     },
   },
   computed: {
@@ -68,35 +106,28 @@ export default {
 </script>
 
 <style scoped>
-.labels {
-  display: flex;
-  flex-flow: row nowrap;
-  margin-top: -0.5rem;
+svg {
+  width: 100%;
+  font-size: 1rem;
+  overflow: visible;
+}
+
+text {
+  /* word-spacing: 1em; */
+  text-anchor: middle;
 }
 
 .min,
 .max {
   font-size: 2em;
-  flex: 0 0 auto;
-}
-
-.max {
-  order: 1;
 }
 
 .value {
-  flex: 1 1 auto;
-  font-size: 6em;
-  margin-top: 1rem;
-  display: flex;
-  justify-content: center;
-  align-items: baseline;
+  font-size: 4em;
+  text-anchor: middle;
 }
 
-.value .unit,
-.min .unit,
-.max .unit {
-  font-size: 0.6em;
-  margin-left: 0.125em;
+.unit {
+  font-size: 0.7em;
 }
 </style>

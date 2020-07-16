@@ -6,7 +6,7 @@ export default {
   props: {
     level: {
       type: Number,
-      default: 1,
+      default: 2,
     },
   },
   computed: {
@@ -23,5 +23,4 @@ export default {
 };
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

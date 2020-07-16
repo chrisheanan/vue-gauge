@@ -9,8 +9,10 @@
     </aside>
 
     <div id="app">
-      <Gauge
-        title="Example"
+      <gauge heading="Required Props" :min="0" :max="100" :value="exampleValue" />
+
+      <gauge
+        heading="Example"
         fontSize="1em"
         :min="0"
         :max="100"
@@ -25,8 +27,8 @@
         maxThresholdFill="darkred"
       />
 
-      <Gauge
-        title="Inverse Example"
+      <gauge
+        heading="Inverse Example"
         fontSize="1em"
         :min="100"
         :max="0"
@@ -43,33 +45,37 @@
         maxThresholdFill="lawngreen"
       />
 
-      <Gauge
-        title="Minimal Example"
+      <gauge
+        heading="Minimal Example"
         :min="5"
         :max="30"
         :value="exampleValue"
         :maxThreshold="25"
         style="width: 430px"
         maxThresholdFill="darkred"
-        :pointerGap="2"
+        :pointerGap="4"
         :thickness="15"
+        :radius="100"
+        fontSize="0.5em"
         :pointerStrokeWidth="4"
-        :pivotRadius="10"
+        :pivotRadius="6"
         :pivotStrokeWidth="3"
         pivotFill="none"
         inactiveFill="#222"
       />
 
-      <Gauge
-        title="Traffic Light Example"
+      <gauge
+        heading="Traffic Light Example"
         :min="0"
         :max="50"
         :value="exampleValue"
+        :labelsOnArc="false"
         style="width: 430px"
-        minThreshold="15"
+        :minThreshold="15"
         minThresholdFill="lawngreen"
-        maxThreshold="35"
+        :maxThreshold="35"
         maxThresholdFill="darkred"
+        :valueToExceedLimits="true"
         activeFill="yellow"
         inactiveFill="yellow"
         :pointerGap="2"
@@ -79,15 +85,15 @@
         :pivotStrokeWidth="3"
       />
 
-      <Gauge
-        title="Negative Range Example"
+      <gauge
+        heading="Negative Range Example"
         :min="-50"
         :max="50"
         unit="C"
         :value="exampleValue - 50"
-        minThreshold="-15"
+        :minThreshold="-15"
         minThresholdFill="skyblue"
-        maxThreshold="35"
+        :maxThreshold="35"
         maxThresholdFill="green"
         style="width: 430px"
         activeFill="dodgerblue"
@@ -102,11 +108,14 @@
         :pivotStrokeWidth="1"
       />
 
-      <Gauge
-        title="Example "
+      <gauge
+        heading="Example Speed-o-meter"
+        minLabel="Slowest"
         :min="0"
+        maxLabel="Fastest"
         :max="120"
         unit="mph"
+        :unitOnArc="false"
         :value="exampleValue"
         style="width: 430px"
         activeFill="currentcolor"
@@ -138,6 +147,9 @@ export default {
     return {
       exampleValue: 0,
     };
+  },
+  mounted() {
+    this.random();
   },
   methods: {
     random() {

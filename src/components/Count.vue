@@ -1,11 +1,8 @@
-<template>
-  <div>
-    <span v-text="displayCount"></span>
-  </div>
-</template>
-
 <script>
 export default {
+  render: function(createElement) {
+    return createElement(this.tag, this.displayCount);
+  },
   props: {
     to: {
       type: Number,
@@ -15,6 +12,11 @@ export default {
       type: Number,
       required: false,
       default: 0,
+    },
+    tag: {
+      type: String,
+      required: false,
+      default: "span",
     },
   },
   data() {
@@ -69,7 +71,7 @@ export default {
       this.previousCount = oldValue;
       this.dirUp = newValue >= oldValue;
 
-      if (this.interval != null) {
+      if (this.interval !== null) {
         clearInterval(this.interval);
       }
 

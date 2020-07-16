@@ -1,8 +1,12 @@
 <template>
-  <section :style="{ fontSize }">
-    <heading :level="2" v-text="title" />
+  <section ref="root">
+    <heading :level="headingLevel" v-text="heading" :style="{ marginTop: 0 }" />
 
-    <svg :viewBox="`0 0 ${diameter} ${radius + 35}`" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      :viewBox="`0 0 ${diameter} ${height}`"
+      :style="{ fontSize, maxWidth: `${diameter}px`, maxHeight: `${height}px` }"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <defs>
         <clipPath :id="`clip-bottom-${_uid}`">
           <rect x="0" y="0" :width="diameter" :height="radius + 10" />
@@ -31,20 +35,8 @@
         </clipPath>
       </defs>
 
-      <g class="rotatable" :style="needleRotationStyle">
-        <pointer
-          :radius="radius"
-          :pointerStroke="pointerStroke"
-          :pointerStrokeWidth="pointerStrokeWidth"
-          :pivotRadius="pivotRadius"
-          :pivotFill="pivotFill"
-          :pivotStroke="pivotStroke"
-          :pivotStrokeWidth="pivotStrokeWidth"
-        />
-      </g>
-
       <g :clip-path="`url(#clip-bottom-${_uid})`">
-        <g class="rotatable" :style="needleRotationStyle">
+        <g :style="rotationStyle">
           <pointer-arcs
             :radius="radius"
             :thickness="thickness"
@@ -57,7 +49,7 @@
       </g>
 
       <g :clip-path="`url(#clip-min-${_uid})`" v-if="minThreshold">
-        <g class="rotatable" :style="needleRotationStyle">
+        <g :style="rotationStyle">
           <pointer-arcs
             :radius="radius"
             :thickness="thickness"
@@ -75,7 +67,7 @@
       </g>
 
       <g :clip-path="`url(#clip-max-${_uid})`" v-if="maxThreshold">
-        <g class="rotatable" :style="needleRotationStyle">
+        <g :style="rotationStyle">
           <pointer-arcs
             :radius="radius"
             :thickness="thickness"
@@ -91,17 +83,33 @@
           />
         </g>
       </g>
-    </svg>
 
-    <labels
-      :min="min"
-      :max="max"
-      :value="displayValue"
-      :dp="dp"
-      :unit="unit"
-      :thickness="thickness"
-      :fontSize="fontSize"
-    />
+      <g :style="rotationStyle">
+        <pointer
+          :radius="radius"
+          :pointerStroke="pointerStroke"
+          :pointerStrokeWidth="pointerStrokeWidth"
+          :pivotRadius="pivotRadius"
+          :pivotFill="pivotFill"
+          :pivotStroke="pivotStroke"
+          :pivotStrokeWidth="pivotStrokeWidth"
+        />
+      </g>
+
+      <labels
+        :min="minLabel ? minLabel : min"
+        :max="maxLabel ? maxLabel : max"
+        :value="displayValue"
+        :dp="dp"
+        :unit="unit"
+        :unitOnArc="unitOnArc"
+        :labelsOnArc="labelsOnArc"
+        :radius="radius"
+        :thickness="thickness"
+        :calculatedFontSize="calculatedFontSize"
+        :offsetY="10 + pivotRadius / 2"
+      />
+    </svg>
   </section>
 </template>
 
@@ -125,9 +133,19 @@ export default {
     PointerArcs,
   },
   props: {
-    title: {
+    heading: {
       type: String,
       required: true,
+    },
+    headingLevel: {
+      type: Number,
+      required: false,
+      default: 2,
+    },
+    fontSize: {
+      type: String,
+      required: false,
+      default: "1em",
     },
     min: {
       type: Number,
@@ -136,6 +154,16 @@ export default {
     max: {
       type: Number,
       required: true,
+    },
+    minLabel: {
+      type: String,
+      required: false,
+      default: null,
+    },
+    maxLabel: {
+      type: String,
+      required: false,
+      default: null,
     },
     value: {
       type: Number,
@@ -161,25 +189,30 @@ export default {
       required: false,
       default: null,
     },
+    unitOnArc: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+    labelsOnArc: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+    valueToExceedLimits: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
     radius: {
       type: Number,
       required: false,
       default: 215,
     },
-    height: {
-      type: Number,
-      required: false,
-      default: 225,
-    },
     thickness: {
       type: Number,
       required: false,
       default: 70,
-    },
-    fontSize: {
-      type: String,
-      required: false,
-      default: "16px",
     },
     pointerGap: {
       type: Number,
@@ -231,9 +264,16 @@ export default {
     return {
       minTransitionDelay: 0,
       maxTransitionDelay: 0,
+      calculatedFontSize: null,
     };
   },
+  mounted() {
+    this.calculatedFontSize = parseFloat(getComputedStyle(this.$refs.root).fontSize);
+  },
   computed: {
+    height() {
+      return this.radius + 20 + this.pivotRadius / 2 + this.calculatedFontSize * 6.25;
+    },
     inverseMode() {
       return this.min > this.max;
     },
@@ -241,6 +281,10 @@ export default {
       return this.radius * 2;
     },
     displayValue() {
+      if (this.valueToExceedLimits) {
+        return this.value;
+      }
+
       if (this.inverseMode) {
         if (this.value > this.min) {
           return this.min;
@@ -269,10 +313,23 @@ export default {
       );
     },
     needleAngle() {
-      return this.calcArcAngle(this.displayValue);
+      const angle = this.calcArcAngle(this.displayValue);
+
+      if (angle < 0) {
+        return 0;
+      }
+
+      if (angle > 180) {
+        return 180;
+      }
+
+      return angle;
     },
-    needleRotationStyle() {
+    rotationStyle() {
       return {
+        transition: "1s ease-in-out transform",
+        transformOrigin: `${this.radius}px ${this.radius + 10}px`,
+        willChange: "transform",
         transform: `rotate(${this.needleAngle}deg)`,
       };
     },
@@ -348,12 +405,6 @@ svg {
   width: 100%;
   display: block;
   margin: auto;
-}
-
-.rotatable {
-  transition: 1s ease-in-out transform;
-  transform: rotate(0deg);
-  transform-origin: 215px 225px;
-  will-change: transform;
+  overflow: visible;
 }
 </style>
