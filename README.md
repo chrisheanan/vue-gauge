@@ -1,5 +1,7 @@
 # vue-gauge
 
+![npm (scoped)](https://img.shields.io/npm/v/@chrisheanan/vue-gauge)
+
 This is a Vue JS component plugin to create gauge charts, which are dynamic and animated. Some styling can be customised to change the look and feel of the gauge to match your required look or theme.
 
 ## Installation
