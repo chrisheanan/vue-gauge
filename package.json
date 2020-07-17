@@ -1,5 +1,5 @@
 {
-  "name": "@cheanan/vue-gauge",
+  "name": "@chrisheanan/vue-gauge",
   "version": "1.0.0",
   "main": "main.js",
   "description": "This is a Vue JS component plugin to create gauge charts.",
@@ -7,12 +7,18 @@
     "type": "git",
     "url": "git+https://github.com/chrisheanan/vue-gauge.git"
   },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
-  },
   "keywords": [
-    "Vue",
-    "Gauge"
+    "vue",
+    "vue-js",
+    "gauge",
+    "speed-o-meter",
+    "tachometer",
+    "measuring",
+    "tachograph",
+    "tach",
+    "measuring instrument",
+    "chart",
+    "graph"
   ],
   "author": "Christopher David Heanan (https://chrish.dev/)",
   "license": "BSD-3-Clause",

@@ -9,13 +9,13 @@ This is available as an NPM package, it can be installed via one of the followin
 ### NPM
 
 ```
-npm i @cheanan/vue-gauge -S
+npm i @chrisheanan/vue-gauge -S
 ```
 
 ### Yarn
 
 ```
-yarn add @cheanan/vue-gauge
+yarn add @chrisheanan/vue-gauge
 ```
 
 ## Usage
@@ -33,7 +33,7 @@ This is a minumum working example:
 </template>
 
 <script>
-import Gauge from '@cheanan/vue-gauge';
+import Gauge from '@chrisheanan/vue-gauge';
 
 export default {
   components: {
