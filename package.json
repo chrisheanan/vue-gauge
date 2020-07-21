@@ -1,6 +1,6 @@
 {
   "name": "@chrisheanan/vue-gauge",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "main.js",
   "description": "This is a Vue JS component plugin to create gauge charts.",
   "repository": {
@@ -36,9 +36,9 @@
     "bezier-easing": "^2.1.0"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "~4.4.0",
-    "@vue/cli-plugin-eslint": "~4.4.0",
-    "@vue/cli-service": "~4.4.0",
+    "@vue/cli-plugin-babel": "^4.4.6",
+    "@vue/cli-plugin-eslint": "^4.4.6",
+    "@vue/cli-service": "^4.4.6",
     "@vue/eslint-config-prettier": "^6.0.0",
     "babel-eslint": "^10.1.0",
     "core-js": "^3.6.5",
