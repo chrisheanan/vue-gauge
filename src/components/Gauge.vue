@@ -1,6 +1,6 @@
 <template>
-  <section ref="root">
-    <heading :level="headingLevel" v-text="heading" :style="{ marginTop: 0 }" />
+  <root :isSection="!!heading" ref="root" class="root" :class="{ padding }">
+    <heading :level="headingLevel" v-if="heading" v-text="heading" :style="{ marginTop: 0 }" />
 
     <svg
       :viewBox="`0 0 ${diameter} ${height}`"
@@ -110,12 +110,13 @@
         :offsetY="10 + pivotRadius / 2"
       />
     </svg>
-  </section>
+  </root>
 </template>
 
 <script>
 import Arc from "./Gauge/Arc.vue";
 import Heading from "./Heading.vue";
+import Root from "./Root.vue";
 import Labels from "./Gauge/Labels.vue";
 import Pointer from "./Gauge/Pointer.vue";
 import PointerArcs from "./Gauge/PointerArcs.vue";
@@ -131,16 +132,23 @@ export default {
     Heading,
     Pointer,
     PointerArcs,
+    Root,
   },
   props: {
     heading: {
       type: String,
-      required: true,
+      required: false,
+      default: null,
     },
     headingLevel: {
       type: Number,
       required: false,
       default: 2,
+    },
+    padding: {
+      type: Boolean,
+      required: false,
+      default: true,
     },
     fontSize: {
       type: String,
@@ -268,7 +276,7 @@ export default {
     };
   },
   mounted() {
-    this.calculatedFontSize = parseFloat(getComputedStyle(this.$refs.root).fontSize);
+    this.calculatedFontSize = parseFloat(getComputedStyle(this.$refs.root.$el).fontSize);
   },
   computed: {
     height() {
@@ -396,8 +404,11 @@ export default {
 </script>
 
 <style scoped>
-section {
+.root {
   position: relative;
+}
+
+.padding {
   padding: 1em;
 }
 

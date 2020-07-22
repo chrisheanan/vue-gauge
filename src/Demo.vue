@@ -12,7 +12,6 @@
       <gauge heading="Required Props" :min="0" :max="100" :value="exampleValue" />
 
       <gauge
-        heading="Example"
         fontSize="1em"
         :min="0"
         :max="100"
@@ -198,9 +197,10 @@ button {
 
 #app {
   text-align: center;
-  margin-top: 60px;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(430px, 1fr));
+  grid-gap: 4em;
+  padding: 2em;
+  place-items: center center;
 }
 </style>
