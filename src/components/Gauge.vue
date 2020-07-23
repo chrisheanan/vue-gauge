@@ -2,11 +2,7 @@
   <root :isSection="!!heading" ref="root" class="root" :class="{ padding }">
     <heading :level="headingLevel" v-if="heading" v-text="heading" :style="{ marginTop: 0 }" />
 
-    <svg
-      :viewBox="`0 0 ${diameter} ${height}`"
-      :style="{ fontSize, maxWidth: `${diameter}px`, maxHeight: `${height}px` }"
-      xmlns="http://www.w3.org/2000/svg"
-    >
+    <svg :viewBox="`0 0 ${diameter} ${height}`" :style="style" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <clipPath :id="`clip-bottom-${_uid}`">
           <rect x="0" y="0" :width="diameter" :height="radius + 10" />
@@ -267,6 +263,11 @@ export default {
       required: false,
       default: "currentcolor",
     },
+    svgStyle: {
+      type: Object,
+      required: false,
+      default: () => ({}),
+    },
   },
   data() {
     return {
@@ -279,6 +280,14 @@ export default {
     this.calculatedFontSize = parseFloat(getComputedStyle(this.$refs.root.$el).fontSize);
   },
   computed: {
+    style() {
+      return {
+        fontSize: this.fontSize,
+        maxWidth: `${this.diameter}px`,
+        maxHeight: `${this.height}px`,
+        ...this.svgStyle,
+      };
+    },
     height() {
       return this.radius + 20 + this.pivotRadius / 2 + this.calculatedFontSize * 6.25;
     },
