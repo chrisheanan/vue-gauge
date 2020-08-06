@@ -78,13 +78,13 @@ export default {
     },
     ...styleProps("inactive", { fill: "currentcolor" }),
   },
-  data() {
-    return {
-      innerRadius: this.radius - this.thickness,
-      outerAngle: this.angle,
-    };
-  },
   computed: {
+    innerRadius() {
+      return this.radius - this.thickness;
+    },
+    outerAngle() {
+      return this.angle;
+    },
     innerAngleAdjustment() {
       return innerAnglePointerAdjustment(this.outerAngle, this.radius, this.innerRadius);
     },

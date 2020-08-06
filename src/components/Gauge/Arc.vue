@@ -65,13 +65,19 @@ export default {
   },
   data() {
     return {
-      innerRadius: this.radius - this.thickness,
-      centerX: this.radius + this.offsetX,
-      centerY: this.radius + this.offsetY,
       originAngleOffset: 180,
     };
   },
   computed: {
+    innerRadius() {
+      return this.radius - this.thickness;
+    },
+    centerX() {
+      return this.radius + this.offsetX;
+    },
+    centerY() {
+      return this.radius + this.offsetY;
+    },
     angleA() {
       return this.max360(this.startAngle - this.originAngleOffset);
     },
